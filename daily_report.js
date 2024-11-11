@@ -1,4 +1,5 @@
-// index.js
+// daily_report.js
+
 const express = require('express');
 const multer = require('multer');
 const { parse } = require('csv-parse/sync');
@@ -8,6 +9,9 @@ const path = require('path');
 
 const app = express();
 const upload = multer({ dest: 'uploads/' });
+
+// Sirve archivos estáticos desde la carpeta "public"
+app.use(express.static(path.join(__dirname, 'public')));
 
 const PRIORITY_USERS = [
   "ABRAHAM SANCHEZ",
@@ -65,8 +69,6 @@ function formatTime(date) {
   return `${hours}:${minutes}:${seconds}`;
 }
 
-app.use(express.static(path.join(__dirname, 'public')));
-
 app.post('/upload', upload.single('file'), async (req, res) => {
   try {
     const filePath = req.file.path;
@@ -101,7 +103,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Report");
 
-    const firstDate = new Date(records[0].Tiempo);
+    const firstDate = new Date(records[0].Tiempo); // Obtén la fecha del primer registro
     const dayName = getDayName(firstDate);
 
     worksheet.columns = [
@@ -116,7 +118,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         pattern: 'solid',
         fgColor: { argb: '002060' },
       };
-      cell.font = { name: 'Calibri', size: 9, color: { argb: 'FFFFFF' }, bold: true };
+      cell.font = { name: 'Calibri Light', size: 9, color: { argb: 'FFFFFF' }, bold: true };
       cell.alignment = { vertical: 'middle', horizontal: 'center' };
       cell.border = {
         top: { style: 'thin' },
@@ -128,15 +130,15 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 
     let rowIndex = 2;
     PRIORITY_USERS.forEach(name => {
-    const times = userEntries[name]; // Mantén el orden del array PRIORITY_USERS
-    if (times && times.length > 0) {
-      times.sort((a, b) => a - b); // Asegúrate de que los tiempos estén ordenados
-      const firstEntry = times[0];
-      const lastEntry = times[times.length - 1];
+      const times = userEntries[name];
+      if (times && times.length > 0) {
+        times.sort((a, b) => a - b);
+        const firstEntry = times[0];
+        const lastEntry = times[times.length - 1];
 
-      const firstEntryTime = formatTime(firstEntry);
-      const lastEntryTime = formatTime(lastEntry);
-      const hoursReported = calculateHoursDifference(firstEntry, lastEntry);
+        const firstEntryTime = formatTime(firstEntry);
+        const lastEntryTime = formatTime(lastEntry);
+        const hoursReported = calculateHoursDifference(firstEntry, lastEntry);
 
       // Escribir en las celdas en el orden de PRIORITY_USERS
       worksheet.mergeCells(`A${rowIndex}:A${rowIndex + 2}`);
@@ -200,8 +202,13 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   }
 });
 
-    const fileName = 'Report.xlsx';
+    // Formatear la fecha del primer registro como "dd-MM-yyyy"
+    const formattedDate = `${String(firstDate.getDate()).padStart(2, '0')}-${String(firstDate.getMonth() + 1).padStart(2, '0')}-${firstDate.getFullYear()}`;
+
+    // Nombre del archivo con la fecha del primer registro
+    const fileName = `MARCAJE DEL DIA CW ${formattedDate}.xlsx`;
     const filePathToSave = path.join(__dirname, fileName);
+    
     await workbook.xlsx.writeFile(filePathToSave);
 
     res.download(filePathToSave, fileName, (err) => {
