@@ -69,6 +69,8 @@ function formatTime(date) {
   return `${hours}:${minutes}:${seconds}`;
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------
+// Logica del Reporte del Dia
 app.post('/upload', upload.single('file'), async (req, res) => {
   try {
     const filePath = req.file.path;
@@ -219,6 +221,119 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   } catch (error) {
     console.error("Error processing file upload:", error);
     res.status(500).send("Error processing file upload");
+  }
+});
+
+//--------------------------------------------------------------------------------------------------------------------------------
+// Logica de Reporte de la Mañana
+
+function formatTimeMorning(date) {
+  if (!date) return ""; // Retorna una cadena vacía si el valor es null o undefined
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${hours}:${minutes}:${seconds}`;
+}
+
+app.post('/upload_morning', upload.single('file'), async (req, res) => {
+  try {
+    const filePath = req.file.path;
+    let fileContent = fs.readFileSync(filePath, 'utf-8');
+
+    // Filtrar líneas innecesarias
+    const lines = fileContent.split('\n').filter(line => {
+      return line.trim() !== '' && !line.includes("Eventos de Hoy"); // Ignorar líneas vacías y encabezados no deseados
+    });
+    fileContent = lines.join('\n');
+
+    // Configurar csv-parse para ignorar errores de longitud inconsistente
+    const records = parse(fileContent, {
+      columns: true,
+      bom: true,
+      skip_empty_lines: true,
+      relax_column_count: true  // Ignorar filas con número inconsistente de columnas
+    });
+
+    const userEntries = {};
+    PRIORITY_USERS.forEach(name => {
+      userEntries[name] = null; // Inicializa con null para cada usuario
+    });
+
+    records.forEach(record => {
+      const fullName = `${record.Nombre} ${record.Apellido}`;
+      if (PRIORITY_USERS.includes(fullName)) {
+        const entryTime = new Date(record.Tiempo);
+        if (!isNaN(entryTime) && (!userEntries[fullName] || entryTime < userEntries[fullName])) {
+          userEntries[fullName] = entryTime; // Guarda el primer marcaje más temprano
+        }
+      }
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Morning Report");
+
+    const firstDate = new Date(records[0].Tiempo);
+    const dayName = getDayName(firstDate);
+
+    worksheet.columns = [
+      { header: "NOMBRE", key: "name", width: 30 },
+      { header: "REPORTE", key: "report", width: 20 },
+      { header: dayName, key: "time", width: 20 },
+    ];
+
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: '002060' },
+      };
+      cell.font = { name: 'Calibri Light', size: 9, color: { argb: 'FFFFFF' }, bold: true };
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+    });
+
+    let rowIndex = 2;
+    PRIORITY_USERS.forEach(name => {
+      const nameCell = worksheet.getCell(`A${rowIndex}`);
+      const reportCell = worksheet.getCell(`B${rowIndex}`);
+      const timeCell = worksheet.getCell(`C${rowIndex}`);
+
+      // Configurar el estilo de la celda del nombre
+      nameCell.value = name;
+      nameCell.font = { name: 'Calibri Light', size: 9, bold: true };
+      
+      // Configurar el estilo de la celda "Primer Marcaje"
+      reportCell.value = "Primer Marcaje";
+      reportCell.font = { name: 'Calibri Light', size: 9 }; // Sin negrita
+      
+      // Configurar el estilo de la celda de tiempo
+      timeCell.value = formatTimeMorning(userEntries[name]);
+      timeCell.font = { name: 'Calibri Light', size: 9 }; // Sin negrita
+
+      worksheet.getRow(rowIndex).eachCell((cell) => {
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
+        };
+      });
+      rowIndex++;
+    });
+
+    const formattedDate = `${String(firstDate.getDate()).padStart(2, '0')}-${String(firstDate.getMonth() + 1).padStart(2, '0')}-${firstDate.getFullYear()}`;
+    const fileName = `REPORTE DE LA MAÑANA CW ${formattedDate}.xlsx`;
+    const filePathToSave = path.join(__dirname, fileName);
+
+    await workbook.xlsx.writeFile(filePathToSave);
+
+    res.download(filePathToSave, fileName, (err) => {
+      if (err) throw err;
+      fs.unlinkSync(filePath);
+      fs.unlinkSync(filePathToSave);
+    });
+  } catch (error) {
+    console.error("Error processing morning report:", error);
+    res.status(500).send("Error processing morning report");
   }
 });
 
