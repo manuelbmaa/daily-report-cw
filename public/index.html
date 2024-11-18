@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IT Reportes</title>
+  <title>Reportes IT</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-light">
 
@@ -17,23 +17,26 @@
     </div>
   </nav>
 
-  <!-- Morning Report Container -->
-<div class="container my-5">
-  <div class="row justify-content-center">
-    <div class="col-md-7">
-      <div class="card shadow">
-        <div class="card-body text-center">
-          <h1 class="h3 mb-4" style="color: #313945;">Reporte de la Mañana</h1>
+<!-- Contenido -->
+<main style="flex: 1;">
+  <div class="container my-5">
+    <!-- Morning Report Container -->
+    <div class="container my-5">
+      <div class="row justify-content-center">
+        <div class="col-md-7">
+          <div class="card shadow">
+            <div class="card-body text-center">
+              <h1 class="h3 mb-4" style="color: #313945;">Reporte de la Mañana</h1>
 
-          <form id="morningForm" enctype="multipart/form-data">
-            <div class="mb-3">
-              <input type="file" name="file" id="morningFileInput" class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-lg w-100 text-white" style="background-color: #313945;">
-              Generar Reporte de la Mañana
-            </button>
-          </form>
-          <p id="morningMessage" class="mt-3 text-success"></p>
+              <form id="morningForm" enctype="multipart/form-data">
+                <div class="mb-3">
+                  <input type="file" name="file" id="morningFileInput" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-lg w-100 text-white" style="background-color: #313945;">
+                Generar Reporte de la Mañana
+                </button>
+              </form>
+              <p id="morningMessage" class="mt-3 text-success"></p>
         </div>
       </div>
     </div>
@@ -60,11 +63,22 @@
       </div>
     </div>
   </div>
+  </div>
+</main>
 
-  <!-- Footer -->
-  <footer class="text-center text-muted py-3">
-    <small>© 2024 Generador de Reportes</small>
-  </footer>
+<!-- Footer -->
+<footer class="text-center py-4" style="background-color: #313945; color: #ffffff; box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.3);">
+  <div class="container">
+    <hr class="mb-4" style="border-top: 1px solid #ffffff;">
+    <p class="mb-2">© 2024 Generador de Reportes</p>
+    <p>
+      Creado por 
+      <a href="#" target="_blank" class="text-decoration-none text-light fw-bold">René Hernández</a> & 
+      <a href="#" target="_blank" class="text-decoration-none text-light fw-bold">Manuel Bolaños</a>
+    </p>
+  </div>
+</footer>
+
 
   <!-- Bootstrap JS and Popper.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
