@@ -7,44 +7,14 @@ const ExcelJS = require('exceljs');
 const fs = require('fs');
 const path = require('path');
 
+// Importa los arreglos desde el users_mega.js
+const { CW_USERS, INJUVE_USERS, MOTORISTAS_USERS, ADDN_USERS, IT_PROYECTOS_USERS, INVEST_USERS } = require('./users_mega');
+
 const app = express();
 const upload = multer({ dest: 'uploads/' });
 
 // Sirve archivos estáticos desde la carpeta "public"
 app.use(express.static(path.join(__dirname, 'public')));
-
-const PRIORITY_USERS = [
-  "ABRAHAM SANCHEZ",
-  "CARLOS EDUARDO NIETO MORALES",
-  "DAYANA MENDEZ ANDRADE",
-  "DIEGO BARRIOS",
-  "DIXINY ACERO",
-  "FRANCISCO JAVIER TOUCEIRO RODRIGUEZ",
-  "GABRIEL GRIMALDI",
-  "GIORGIO MARINETTI",
-  "HERBERTH ALEXIS PORTILLO MONTES",
-  "JONATHAN CHACÓN",
-  "MARIANA TINEO",
-  "MOISES CARVALHO",
-  "NELSON BOLIVAR",
-  "OLGA MAIRIETTE CERÓN TORRES",
-  "PEDRO ALVAREZ",
-  "PIERINA GARCIA",
-  "RAFAEL ANDRES PANFIL VILLANUEVA",
-  "SANTY JESÚS BEVILACQUA",
-  "SERGIO ALFONSO PAZOS NOGUERA",
-  "SONIA ESPINOZA",
-  "TOMAS HERNANDEZ",
-  "VALENTINA CEDENO",
-  "VANESSA PASQUALE BONILLA",
-  "MANUEL RODRIGUES",
-  "PIA CARO",
-  "JASMIN ARTEAGA",
-  "FELIX CANISALEZ",
-  "MIGUEL ARVELO",
-  "NADIM HANNA",
-  "JOSSALVY MILLAN",
-];
 
 // Función para calcular la diferencia de tiempo en formato HH:MM:SS
 function calculateHoursDifference(start, end) {
@@ -91,7 +61,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     const userEntries = {};
     records.forEach(record => {
       const fullName = `${record.Nombre} ${record.Apellido}`;
-      if (PRIORITY_USERS.includes(fullName)) {
+      if (CW_USERS.includes(fullName)) {
         if (!userEntries[fullName]) {
           userEntries[fullName] = [];
         }
@@ -131,7 +101,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     });
 
     let rowIndex = 2;
-    PRIORITY_USERS.forEach(name => {
+    CW_USERS.forEach(name => {
       const times = userEntries[name];
       if (times && times.length > 0) {
         times.sort((a, b) => a - b);
@@ -142,7 +112,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         const lastEntryTime = formatTime(lastEntry);
         const hoursReported = calculateHoursDifference(firstEntry, lastEntry);
 
-      // Escribir en las celdas en el orden de PRIORITY_USERS
+      // Escribir en las celdas en el orden de CW_USERS
       worksheet.mergeCells(`A${rowIndex}:A${rowIndex + 2}`);
       const nameCell = worksheet.getCell(`A${rowIndex}`);
       nameCell.value = name;
@@ -255,13 +225,13 @@ app.post('/upload_morning', upload.single('file'), async (req, res) => {
     });
 
     const userEntries = {};
-    PRIORITY_USERS.forEach(name => {
+    CW_USERS.forEach(name => {
       userEntries[name] = null; // Inicializa con null para cada usuario
     });
 
     records.forEach(record => {
       const fullName = `${record.Nombre} ${record.Apellido}`;
-      if (PRIORITY_USERS.includes(fullName)) {
+      if (CW_USERS.includes(fullName)) {
         const entryTime = new Date(record.Tiempo);
         if (!isNaN(entryTime) && (!userEntries[fullName] || entryTime < userEntries[fullName])) {
           userEntries[fullName] = entryTime; // Guarda el primer marcaje más temprano
@@ -292,7 +262,7 @@ app.post('/upload_morning', upload.single('file'), async (req, res) => {
     });
 
     let rowIndex = 2;
-    PRIORITY_USERS.forEach(name => {
+    CW_USERS.forEach(name => {
       const nameCell = worksheet.getCell(`A${rowIndex}`);
       const reportCell = worksheet.getCell(`B${rowIndex}`);
       const timeCell = worksheet.getCell(`C${rowIndex}`);
@@ -334,6 +304,245 @@ app.post('/upload_morning', upload.single('file'), async (req, res) => {
   } catch (error) {
     console.error("Error processing morning report:", error);
     res.status(500).send("Error processing morning report");
+  }
+});
+
+//--------------------------------------------------------------------------------------------------------------------------------
+// Logica de Reporte Semanal
+
+// Definir los grupos de usuarios
+const userGroups = {
+  CW: CW_USERS,
+  INJUVE: INJUVE_USERS,
+  MOTORISTAS: MOTORISTAS_USERS,
+  ADDN: ADDN_USERS,
+  "IT PROYECTOS": IT_PROYECTOS_USERS,
+  INVEST: INVEST_USERS,
+};
+
+// Función para normalizar nombres
+function normalizeName(name) {
+  return name ? name.trim().toUpperCase() : null;
+}
+
+// Función para calcular la diferencia de tiempo en formato HH:MM:SS
+function calculateHoursDifference(start, end) {
+  if (!start || !end) return "00:00:00";
+  const msDifference = end - start;
+  const hours = Math.floor(msDifference / (1000 * 60 * 60));
+  const minutes = Math.floor((msDifference % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((msDifference % (1000 * 60)) / 1000);
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+// Función para formatear el tiempo en HH:MM:SS
+function formatTime(date) {
+  if (!date || isNaN(date)) return "00:00:00";
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${hours}:${minutes}:${seconds}`;
+}
+
+// Función para verificar si una fecha es válida y pertenece a días laborables
+function isWeekday(date) {
+  const day = date.getDay();
+  return day >= 1 && day <= 5; // Lunes = 1, ..., Viernes = 5
+}
+
+// Función para obtener el nombre del día de la semana
+function getDayName(date) {
+  const dayNames = ["LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES"];
+  const dayIndex = date.getDay() - 1; // Ajustar para que lunes sea el índice 0
+  if (dayIndex < 0 || dayIndex >= dayNames.length) return null; // Validar días fuera de rango
+  return `${dayNames[dayIndex]} ${String(date.getDate()).padStart(2, '0')}`;
+}
+
+// Función para actualizar el primer y último marcaje
+function updateEntry(entry, entryTime) {
+  if (!entry.first || new Date(entryTime) < new Date(entry.first)) {
+    entry.first = entryTime;
+  }
+  if (!entry.last || new Date(entryTime) > new Date(entry.last)) {
+    entry.last = entryTime;
+  }
+}
+
+// Configuración de bordes para las celdas
+const borderStyle = {
+  top: { style: 'thin' },
+  left: { style: 'thin' },
+  bottom: { style: 'thin' },
+  right: { style: 'thin' },
+};
+
+// Estilo general para todas las celdas
+const generalFontStyle = {
+  name: 'Calibri Light',
+  size: 9,
+};
+
+// Función para aplicar bordes a todas las celdas
+function applyBordersToRow(row) {
+  row.eachCell(cell => {
+    cell.border = borderStyle;
+  });
+}
+
+// Endpoint para procesar y generar el reporte semanal
+app.post('/upload_weekly', upload.single('file'), async (req, res) => {
+  try {
+    const filePath = req.file.path;
+    let fileContent = fs.readFileSync(filePath, 'utf-8');
+
+    // Filtrar encabezados innecesarios
+    const lines = fileContent.split('\n').filter(line => line.trim() !== '');
+    if (lines[0].includes("Todos los Eventos")) {
+      lines.shift();
+    }
+    fileContent = lines.join('\n');
+
+    // Leer y parsear los registros del CSV
+    const records = parse(fileContent, {
+      columns: true,
+      bom: true,
+      skip_empty_lines: true,
+      relax_column_count: true,
+    });
+
+    // Filtrar registros solo de lunes a viernes y con fechas válidas
+    const filteredRecords = records.filter(record => {
+      const entryTime = new Date(record.Tiempo);
+      return isWeekday(entryTime) && !isNaN(entryTime);
+    });
+
+    // Extraer fechas únicas y ordenarlas
+    const uniqueDates = [...new Set(filteredRecords.map(record => {
+      const date = new Date(record.Tiempo);
+      return date.toISOString().split('T')[0];
+    }))].sort();
+
+    // Convertir fechas únicas a formato legible
+    const daysOfWeek = uniqueDates.map(dateStr => {
+      const date = new Date(dateStr);
+      return getDayName(date);
+    }).filter(Boolean); // Filtrar valores nulos o inválidos
+
+    const workbook = new ExcelJS.Workbook();
+
+    // Generar una hoja para cada grupo de usuarios
+    for (const [sheetName, users] of Object.entries(userGroups)) {
+      const worksheet = workbook.addWorksheet(sheetName);
+
+      // Configurar columnas
+      worksheet.columns = [
+        { header: "NOMBRE", key: "name", width: 30 },
+        { header: "REPORTE", key: "report", width: 20 },
+        ...daysOfWeek.map(day => ({ header: day, key: day, width: 20 })),
+      ];
+
+      // Estilo de encabezados
+      worksheet.getRow(1).eachCell(cell => {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: '002060' },
+        };
+        cell.font = { ...generalFontStyle, color: { argb: 'FFFFFF' }, bold: true };
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        cell.border = borderStyle;
+      });
+
+      // Inicializar datos de usuarios
+      const userEntries = {};
+      users.forEach(user => {
+        userEntries[user] = uniqueDates.map(() => ({ first: null, last: null }));
+      });
+
+      // Procesar registros
+      filteredRecords.forEach(record => {
+        const fullName = normalizeName(`${record.Nombre} ${record.Apellido}`);
+        const entryTime = new Date(record.Tiempo);
+        if (!users.map(normalizeName).includes(fullName) || isNaN(entryTime)) return;
+
+        const entryDate = entryTime.toISOString().split('T')[0];
+        const dayIndex = uniqueDates.indexOf(entryDate);
+        if (dayIndex !== -1) {
+          const entry = userEntries[fullName][dayIndex];
+          updateEntry(entry, entryTime);
+        }
+      });
+
+      // Rellenar datos en la hoja
+      let rowIndex = 2;
+      users.forEach(user => {
+        const entries = userEntries[user];
+        worksheet.mergeCells(`A${rowIndex}:A${rowIndex + 2}`);
+        const nameCell = worksheet.getCell(`A${rowIndex}`);
+        nameCell.value = user;
+        nameCell.alignment = { vertical: 'middle', horizontal: 'center' };
+        nameCell.font = { ...generalFontStyle, bold: true };
+        nameCell.border = borderStyle;
+
+        uniqueDates.forEach((date, index) => {
+          const entry = entries[index];
+          const firstTime = entry.first ? formatTime(entry.first) : "00:00:00";
+          const lastTime = entry.last ? formatTime(entry.last) : "00:00:00";
+          const hoursReported = entry.first && entry.last
+            ? calculateHoursDifference(entry.first, entry.last)
+            : "00:00:00";
+
+          // Rellenar celdas con los datos
+          worksheet.getCell(`B${rowIndex}`).value = "Primer Marcaje";
+          worksheet.getCell(`${String.fromCharCode(67 + index)}${rowIndex}`).value = firstTime;
+
+          worksheet.getCell(`B${rowIndex + 1}`).value = "Último Marcaje";
+          worksheet.getCell(`${String.fromCharCode(67 + index)}${rowIndex + 1}`).value = lastTime;
+
+          worksheet.getCell(`B${rowIndex + 2}`).value = "Horas Reportadas";
+          const hoursCell = worksheet.getCell(`${String.fromCharCode(67 + index)}${rowIndex + 2}`);
+          hoursCell.value = hoursReported;
+
+          // Aplicar formato especial a las horas reportadas
+          if (hoursReported !== "00:00:00") {
+            hoursCell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: '8ED973' },
+            };
+            hoursCell.font = { ...generalFontStyle, bold: true };
+          }
+
+          // Aplicar bordes a las celdas
+          worksheet.getCell(`B${rowIndex}`).border = borderStyle;
+          worksheet.getCell(`B${rowIndex + 1}`).border = borderStyle;
+          worksheet.getCell(`B${rowIndex + 2}`).border = borderStyle;
+          worksheet.getCell(`${String.fromCharCode(67 + index)}${rowIndex}`).border = borderStyle;
+          worksheet.getCell(`${String.fromCharCode(67 + index)}${rowIndex + 1}`).border = borderStyle;
+          hoursCell.border = borderStyle;
+        });
+
+        // Aplicar bordes a la fila completa
+        applyBordersToRow(worksheet.getRow(rowIndex));
+        applyBordersToRow(worksheet.getRow(rowIndex + 1));
+        applyBordersToRow(worksheet.getRow(rowIndex + 2));
+
+        rowIndex += 3;
+      });
+    }
+
+    const fileName = `REPORTE_SEMANAL.xlsx`;
+    const filePathToSave = path.join(__dirname, fileName);
+    await workbook.xlsx.writeFile(filePathToSave);
+
+    res.download(filePathToSave, fileName, err => {
+      if (err) throw err;
+      fs.unlinkSync(filePath);
+      fs.unlinkSync(filePathToSave);
+    });
+  } catch (error) {
+    console.error("Error procesando el reporte semanal:", error);
+    res.status(500).send("Error procesando el reporte semanal");
   }
 });
 
