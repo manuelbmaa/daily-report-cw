@@ -1,108 +1,164 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reportes IT</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css"
+    rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .navbar {
+      background-color: #313945;
+    }
+
+    .card {
+      border: none;
+      border-radius: 15px;
+    }
+
+    .card-body {
+      padding: 2rem;
+    }
+
+    .form-control {
+      border: 1px solid #ced4da;
+      border-radius: 10px;
+    }
+
+    .form-control:focus {
+      border-color: #313945;
+      box-shadow: 0 0 5px rgba(49, 57, 69, 0.5);
+    }
+
+    .btn {
+      background-color: #313945 !important;
+      color: #ffffff;
+      border: 1px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #ffffff !important;
+      color: #313945 !important;
+      border-color: #313945;
+    }
+
+    .btn:focus {
+      box-shadow: 0 0 5px rgba(49, 57, 69, 0.5);
+      outline: none;
+      transition: box-shadow 0.3s ease;
+    }
+
+
+    .section-title {
+      color: #313945;
+      font-weight: bold;
+    }
+
+    footer {
+      background-color: #313945;
+      color: #ffffff;
+    }
+
+    footer a {
+      color: #ffffff;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
-<body class="bg-light">
+
+<body>
 
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #313945;">
+  <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
       <a class="navbar-brand" href="#">Generador de Reportes</a>
     </div>
   </nav>
 
-<!-- Contenido -->
-<main style="flex: 1;">
-  <div class="container my-5">
-    <!-- Morning Report Container -->
-    <div class="container my-5">
-      <div class="row justify-content-center">
-        <div class="col-md-7">
-          <div class="card shadow">
-            <div class="card-body text-center">
-              <h1 class="h3 mb-4" style="color: #313945;">Reporte de la Mañana</h1>
-
-              <form id="morningForm" enctype="multipart/form-data">
-                <div class="mb-3">
-                  <input type="file" name="file" id="morningFileInput" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-lg w-100 text-white" style="background-color: #313945;">
-                Generar Reporte de la Mañana
-                </button>
-              </form>
+  <!-- Main Content -->
+  <main class="container my-5">
+    <!-- Form Sections -->
+    <div class="row gy-5">
+      <!-- Morning Report -->
+      <div class="col-md-6 mx-auto">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h1 class="h4 section-title mb-4">Reporte de la Mañana</h1>
+            <form id="morningForm" enctype="multipart/form-data">
+              <label for="morningFileInput" class="form-label">Seleccionar archivo</label>
+              <input type="file" name="file" id="morningFileInput" class="form-control mb-3" accept=".csv" required>
+              <button type="submit" class="btn btn-lg w-100 text-white" style="background-color: #313945;">
+                <i class="bi bi-cloud-upload"></i> Generar Reporte de la Mañana
+              </button>
               <p id="morningMessage" class="mt-3 text-success"></p>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
 
-  <!-- Daily Report Container -->
-  <div class="container my-5">
-    <div class="row justify-content-center">
-      <div class="col-md-7">
-        <div class="card shadow">
-          <div class="card-body text-center">
-            <h1 class="h3 mb-4" style="color: #313945;">Reporte Diario</h1>
-
+      <!-- Daily Report -->
+      <div class="col-md-6 mx-auto">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h1 class="h4 section-title mb-4">Reporte Diario</h1>
             <form id="uploadForm" enctype="multipart/form-data">
-              <div class="mb-3">
-                <input type="file" name="file" id="fileInput" class="form-control" required>
-              </div>
-              <button type="submit" class="btn btn-lg w-100 text-white" style="background-color: #313945;">Generar Reporte Diario</button>
+              <label for="fileInput" class="form-label">Seleccionar archivo</label>
+              <input type="file" name="file" id="fileInput" class="form-control mb-3" accept=".csv" required>
+              <button type="submit" class="btn btn-lg w-100 text-white" style="background-color: #313945;">
+                <i class="bi bi-cloud-upload"></i> Generar Reporte Diario
+              </button>
+              <p id="message" class="mt-3 text-success"></p>
             </form>
-            <p id="message" class="mt-3 text-success"></p>
           </div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Week Report Container -->
-  <div class="container my-5">
-    <div class="row justify-content-center">
-      <div class="col-md-7">
-        <div class="card shadow">
-          <div class="card-body text-center">
-            <h1 class="h3 mb-4" style="color: #313945;">Reporte Semanal</h1>
-
+      <!-- Weekly Report -->
+      <div class="col-md-6 mx-auto">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h1 class="h4 section-title mb-4">Reporte Semanal</h1>
             <form id="weekForm" action="/upload_weekly" enctype="multipart/form-data" method="POST">
-              <div class="mb-3">
-                <input type="file" name="file" id="fileInput" class="form-control" required>
-              </div>
-              <button type="submit" class="btn btn-lg w-100 text-white" style="background-color: #313945;">Generar Reporte Semanal</button>
+              <label for="weekFileInput" class="form-label">Seleccionar archivo</label>
+              <input type="file" name="file" id="weekFileInput" class="form-control mb-3" accept=".csv" required>
+              <button type="submit" class="btn btn-lg w-100 text-white" style="background-color: #313945;">
+                <i class="bi bi-cloud-upload"></i> Generar Reporte Semanal
+              </button>
+              <p id="message" class="mt-3 text-success"></p>
             </form>
-            <p id="message" class="mt-3 text-success"></p>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  </div>
-</main>
+  </main>
 
-<!-- Footer -->
-<footer class="text-center py-4" style="background-color: #313945; color: #ffffff; box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.3);">
-  <div class="container">
-    <hr class="mb-4" style="border-top: 1px solid #ffffff;">
-    <p class="mb-2">© 2024 Generador de Reportes</p>
-    <p>
-      Creado por 
-      <a href="#" target="_blank" class="text-decoration-none text-light fw-bold">René Hernández</a> & 
-      <a href="#" target="_blank" class="text-decoration-none text-light fw-bold">Manuel Bolaños</a>
-    </p>
-  </div>
-</footer>
+  <!-- Footer -->
+  <footer class="text-center py-4">
+    <div class="container">
+      <hr class="mb-4" style="border-top: 1px solid #ffffff;">
+      <p class="mb-2">© 2024 Generador de Reportes</p>
+      <p>Creado por
+        <a href="#" target="_blank">René Hernández</a> &
+        <a href="https://www.linkedin.com/in/manuel-marc%C3%ADa-264024219/" target="_blank">Manuel Bolaños</a>
+      </p>
+    </div>
+  </footer>
 
-
-  <!-- Bootstrap JS and Popper.js -->
+  <!-- Bootstrap JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-  <script src="script.js"></script>
 </body>
+
 </html>
