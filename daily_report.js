@@ -382,6 +382,12 @@ const generalFontStyle = {
   size: 9,
 };
 
+// Estilo para centrado de texto
+const centeredAlignment = {
+  vertical: 'middle',
+  horizontal: 'center'
+};
+
 // Función para aplicar bordes a todas las celdas
 function applyBordersToRow(row) {
   row.eachCell(cell => {
@@ -480,7 +486,7 @@ app.post('/upload_weekly', upload.single('file'), async (req, res) => {
         worksheet.mergeCells(`A${rowIndex}:A${rowIndex + 2}`);
         const nameCell = worksheet.getCell(`A${rowIndex}`);
         nameCell.value = user;
-        nameCell.alignment = { vertical: 'middle', horizontal: 'center' };
+        nameCell.alignment = centeredAlignment;
         nameCell.font = { ...generalFontStyle, bold: true };
         nameCell.border = borderStyle;
 
@@ -504,7 +510,7 @@ app.post('/upload_weekly', upload.single('file'), async (req, res) => {
           hoursCell.value = hoursReported;
 
           // Aplicar formato especial a las horas reportadas
-          if (hoursReported !== "00:00:00") {
+          if (hoursReported !== "00:00:00" || hoursReported == "00:00:00") {
             hoursCell.fill = {
               type: 'pattern',
               pattern: 'solid',
@@ -531,7 +537,7 @@ app.post('/upload_weekly', upload.single('file'), async (req, res) => {
       });
     }
 
-    const fileName = `REPORTE_SEMANAL.xlsx`;
+    const fileName = `REPORTE SEMANAL.xlsx`;
     const filePathToSave = path.join(__dirname, fileName);
     await workbook.xlsx.writeFile(filePathToSave);
 
