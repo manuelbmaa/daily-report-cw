@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url(./bg.png);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-card {
+            max-width: 400px;
+            width: 100%;
+            padding: 2rem;
+            border-radius: 15px;
+            background-color: rgba(255, 255, 255); /* Fondo con transparencia */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background-color: #313945;
+            border-color: #313945;
+        }
+
+        .btn-primary:hover {
+            background-color: #ffffff;
+            color: #313945;
+            border-color: #313945;
+        }
+
+        .form-label {
+            font-weight: 600;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 8px rgba(49, 57, 69, 0.5);
+            border-color: #313945;
+        }
+
+        #errorMessage {
+            display: none;
+            font-size: 0.875rem;
+            color: #d9534f;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-card">
+        <h1 class="h4 text-center mb-4">Iniciar Sesión</h1>
+        <form id="loginForm">
+            <div class="mb-3">
+                <label for="username" class="form-label">Usuario</label>
+                <input type="text" id="username" class="form-control" placeholder="Ingrese su usuario" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" id="password" class="form-control" placeholder="Ingrese su contraseña" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+            <p id="errorMessage" class="text-danger mt-3">Credenciales incorrectas.</p>
+        </form>
+    </div>
+
+    <script src="info.js"></script>
+</body>
+
+</html>
