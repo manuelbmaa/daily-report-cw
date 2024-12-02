@@ -92,7 +92,7 @@
         <img src="logo.png" width="60" alt="Logo" class="me-2">
         Generador de Reportes
       </a>
-      <button id="logoutButton" class="btn btn-outline-light ms-auto">Cerrar Sesión</button>
+      <button id="logoutButton" class="btn btn-outline-light ms-auto"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</button>
     </div>
   </nav>
   <script>
@@ -152,6 +152,23 @@
               <input type="file" name="file" id="fileInput" class="form-control mb-3" accept=".csv" required>
               <button type="submit" class="btn btn-lg w-100 text-white" style="background-color: #313945;">
                 <i class="bi bi-cloud-upload"></i> Generar Reporte Semanal
+              </button>
+              <p id="message" class="mt-3 text-success"></p>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weekend Report -->
+      <div class="col-md-6 mx-auto">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h1 class="h4 section-title mb-4">Reporte Fin de Semana</h1>
+            <form id="weekendForm" action="/upload_weekend" enctype="multipart/form-data" method="POST">
+              <label for="weekendFileInput" class="form-label">Seleccionar archivo</label>
+              <input type="file" name="file" id="fileInput" class="form-control mb-3" accept=".csv" required>
+              <button type="submit" class="btn btn-lg w-100 text-white" style="background-color: #313945;">
+                <i class="bi bi-cloud-upload"></i> Generar Reporte Fin de Semana
               </button>
               <p id="message" class="mt-3 text-success"></p>
             </form>
