@@ -9,6 +9,12 @@ html, body {
 body {
   display: flex;
   flex-direction: column;
+  background-color: #dedede;
+}
+
+.navbar {
+  background-color: #313945;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
 }
 
 h1 {
@@ -38,10 +44,88 @@ button:hover {
   color: green;
 }
 
+.card {
+  border: none;
+  border-radius: 15px;
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+.form-control {
+  border: 1px solid #ced4da;
+  border-radius: 10px;
+}
+
+.form-control:focus {
+  border-color: #313945;
+  box-shadow: 0 0 5px rgba(49, 57, 69, 0.5);
+}
+
+.btn {
+  background-color: #313945 !important;
+  color: #ffffff;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #ffffff !important;
+  color: #313945 !important;
+  border-color: #313945;
+}
+
+.btn:focus {
+  box-shadow: 0 0 5px rgba(49, 57, 69, 0.5);
+  outline: none;
+  transition: box-shadow 0.3s ease;
+}
+
+
+.section-title {
+  color: #313945;
+  font-weight: bold;
+}
+
+.shadow-sm {
+  box-shadow: 10px 1rem .25rem rgba(0, 0, 0, .075) !important;
+}
+
+/* Estilo para las tabs */
+.nav-tabs .nav-link {
+  background-color: #313945;
+  color: white;
+  border: none;
+  border-radius: 0;
+}
+
+/* Cambio de estilo al pasar el mouse */
+.nav-tabs .nav-link:hover {
+  background-color: white;
+  color: black;
+}
+
+/* Pestaña activa */
+.nav-tabs .nav-link.active {
+  background-color: white;
+  color: black;
+}
+
 footer {
   background-color: #313945;
   color: #ffffff;
   text-align: center;
   padding: 1rem 0;
   margin-top: auto;
+  box-shadow: 0 -6px 10px rgba(0, 0, 0, 0.3);
+}
+
+footer a {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
 }

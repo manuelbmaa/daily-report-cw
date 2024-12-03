@@ -10,81 +10,11 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
   <link rel="icon" href="ico.png" type="image/png" sizes="32x32">
   <script src="loggedin.js"></script>
-  <style>
-    body {
-      background-color: #dedede;
-    }
-
-    .navbar {
-      background-color: #313945;
-    }
-
-    .card {
-      border: none;
-      border-radius: 15px;
-    }
-
-    .card-body {
-      padding: 2rem;
-    }
-
-    .form-control {
-      border: 1px solid #ced4da;
-      border-radius: 10px;
-    }
-
-    .form-control:focus {
-      border-color: #313945;
-      box-shadow: 0 0 5px rgba(49, 57, 69, 0.5);
-    }
-
-    .btn {
-      background-color: #313945 !important;
-      color: #ffffff;
-      border: 1px solid transparent;
-      transition: all 0.3s ease;
-    }
-
-    .btn:hover {
-      background-color: #ffffff !important;
-      color: #313945 !important;
-      border-color: #313945;
-    }
-
-    .btn:focus {
-      box-shadow: 0 0 5px rgba(49, 57, 69, 0.5);
-      outline: none;
-      transition: box-shadow 0.3s ease;
-    }
-
-
-    .section-title {
-      color: #313945;
-      font-weight: bold;
-    }
-
-    footer {
-      background-color: #313945;
-      color: #ffffff;
-    }
-
-    footer a {
-      color: #ffffff;
-      text-decoration: none;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
-    }
-
-    .shadow-sm {
-      box-shadow: 10px 1rem .25rem rgba(0, 0, 0, .075) !important
-    }
-  </style>
+  <!-- CSS -->
+  <link rel="stylesheet" href="styles.css" type="text/css">
 </head>
 
 <body>
-
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
@@ -103,78 +33,109 @@
     });
   </script>
 
-
   <!-- Main Content -->
   <main class="container my-5">
     <!-- Form Sections -->
     <div class="row gy-5">
-      <!-- Morning Report -->
-      <div class="col-md-6 mx-auto">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h1 class="h4 section-title mb-4">Reporte de la Mañana</h1>
-            <form id="morningForm" enctype="multipart/form-data">
-              <label for="morningFileInput" class="form-label">Seleccionar archivo</label>
-              <input type="file" name="file" id="morningFileInput" class="form-control mb-3" accept=".csv" required>
-              <button type="submit" class="btn btn-lg w-100 text-white" style="background-color: #313945;">
-                <i class="bi bi-cloud-upload"></i> Generar Reporte de la Mañana
-              </button>
-              <p id="morningMessage" class="mt-3 text-success"></p>
-            </form>
-          </div>
-        </div>
-      </div>
+      <div class="container mt-5" id="contenedor">
+        <br>
+        <h1 class="text-center">Tipos de Reportes</h1>
+        <br>
+        <!-- Navegación de Tabs -->
+        <ul class="nav nav-tabs justify-content-center" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="opcion1-tab" data-bs-toggle="tab" data-bs-target="#opcion1" type="button" role="tab" aria-controls="opcion1" aria-selected="true">Reporte de la Mañana</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="opcion2-tab" data-bs-toggle="tab" data-bs-target="#opcion2" type="button" role="tab" aria-controls="opcion2" aria-selected="false">Reporte Diario</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="opcion3-tab" data-bs-toggle="tab" data-bs-target="#opcion3" type="button" role="tab" aria-controls="opcion3" aria-selected="false">Reporte Semanal</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="opcion4-tab" data-bs-toggle="tab" data-bs-target="#opcion4" type="button" role="tab" aria-controls="opcion4" aria-selected="false">Reporte Fin de Semana</button>
+          </li>
+        </ul>
+    
+        <!-- Contenido de los Tabs -->
+        <div class="tab-content mt-3" id="myTabContent">
+            <div class="tab-pane fade show active" id="opcion1" role="tabpanel" aria-labelledby="opcion1-tab">
+              <!-- Morning Report -->
+              <div class="col-md-7 mx-auto">
+                <div class="card shadow-sm">
+                  <div class="card-body">
+                    <h1 class="h4 section-title mb-4">Reporte de la Mañana</h1>
+                    <form id="morningForm" enctype="multipart/form-data">
+                    <label for="morningFileInput" class="form-label">Seleccionar archivo</label>
+                    <input type="file" name="file" id="morningFileInput" class="form-control mb-3" accept=".csv" required>
+                    <button type="submit" class="btn btn-lg w-100 text-white" style="background-color: #313945;">
+                      <i class="bi bi-cloud-upload"></i> Generar Reporte de la Mañana
+                    </button>
+                    <p id="morningMessage" class="mt-3 text-success"></p>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-      <!-- Daily Report -->
-      <div class="col-md-6 mx-auto">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h1 class="h4 section-title mb-4">Reporte Diario</h1>
-            <form id="uploadForm" enctype="multipart/form-data">
-              <label for="fileInput" class="form-label">Seleccionar archivo</label>
-              <input type="file" name="file" id="fileInput" class="form-control mb-3" accept=".csv" required>
-              <button type="submit" class="btn btn-lg w-100 text-white" style="background-color: #313945;">
-                <i class="bi bi-cloud-upload"></i> Generar Reporte Diario
-              </button>
-              <p id="message" class="mt-3 text-success"></p>
-            </form>
-          </div>
-        </div>
-      </div>
+            <div class="tab-pane fade" id="opcion2" role="tabpanel" aria-labelledby="opcion2-tab">
+                <!-- Daily Report -->
+                <div class="col-md-7 mx-auto">
+                  <div class="card shadow-sm">
+                    <div class="card-body">
+                      <h1 class="h4 section-title mb-4">Reporte Diario</h1>
+                      <form id="uploadForm" enctype="multipart/form-data">
+                        <label for="fileInput" class="form-label">Seleccionar archivo</label>
+                        <input type="file" name="file" id="fileInput" class="form-control mb-3" accept=".csv" required>
+                        <button type="submit" class="btn btn-lg w-100 text-white" style="background-color: #313945;">
+                          <i class="bi bi-cloud-upload"></i> Generar Reporte Diario
+                        </button>
+                        <p id="message" class="mt-3 text-success"></p>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+            </div>
 
-      <!-- Weekly Report -->
-      <div class="col-md-6 mx-auto">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h1 class="h4 section-title mb-4">Reporte Semanal</h1>
-            <form id="weekForm" action="/upload_weekly" enctype="multipart/form-data" method="POST">
-              <label for="weekFileInput" class="form-label">Seleccionar archivo</label>
-              <input type="file" name="file" id="fileInput" class="form-control mb-3" accept=".csv" required>
-              <button type="submit" class="btn btn-lg w-100 text-white" style="background-color: #313945;">
-                <i class="bi bi-cloud-upload"></i> Generar Reporte Semanal
-              </button>
-              <p id="message" class="mt-3 text-success"></p>
-            </form>
-          </div>
-        </div>
-      </div>
+            <div class="tab-pane fade" id="opcion3" role="tabpanel" aria-labelledby="opcion3-tab">
+                <!-- Weekly Report -->
+                <div class="col-md-7 mx-auto">
+                  <div class="card shadow-sm">
+                    <div class="card-body">
+                      <h1 class="h4 section-title mb-4">Reporte Semanal</h1>
+                      <form id="weekForm" action="/upload_weekly" enctype="multipart/form-data" method="POST">
+                        <label for="weekFileInput" class="form-label">Seleccionar archivo</label>
+                        <input type="file" name="file" id="fileInput" class="form-control mb-3" accept=".csv" required>
+                        <button type="submit" class="btn btn-lg w-100 text-white" style="background-color: #313945;">
+                          <i class="bi bi-cloud-upload"></i> Generar Reporte Semanal
+                        </button>
+                        <p id="message" class="mt-3 text-success"></p>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+            </div>
 
-      <!-- Weekend Report -->
-      <div class="col-md-6 mx-auto">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h1 class="h4 section-title mb-4">Reporte Fin de Semana</h1>
-            <form id="weekendForm" action="/upload_weekend" enctype="multipart/form-data" method="POST">
-              <label for="weekendFileInput" class="form-label">Seleccionar archivo</label>
-              <input type="file" name="file" id="fileInput" class="form-control mb-3" accept=".csv" required>
-              <button type="submit" class="btn btn-lg w-100 text-white" style="background-color: #313945;">
-                <i class="bi bi-cloud-upload"></i> Generar Reporte Fin de Semana
-              </button>
-              <p id="message" class="mt-3 text-success"></p>
-            </form>
+            <div class="tab-pane fade" id="opcion4" role="tabpanel" aria-labelledby="opcion4-tab">
+              <!-- Weekend Report -->
+              <div class="col-md-7 mx-auto">
+                <div class="card shadow-sm">
+                  <div class="card-body">
+                    <h1 class="h4 section-title mb-4">Reporte Fin de Semana</h1>
+                    <form id="weekendForm" action="/upload_weekend" enctype="multipart/form-data" method="POST">
+                      <label for="weekendFileInput" class="form-label">Seleccionar archivo</label>
+                      <input type="file" name="file" id="fileInput" class="form-control mb-3" accept=".csv" required>
+                      <button type="submit" class="btn btn-lg w-100 text-white" style="background-color: #313945;">
+                        <i class="bi bi-cloud-upload"></i> Generar Reporte Fin de Semana
+                      </button>
+                      <p id="message" class="mt-3 text-success"></p>
+                    </form>
+                  </div>
+                </div>
+              </div>
           </div>
         </div>
-      </div>
+    </div>
     </div>
   </main>
 
