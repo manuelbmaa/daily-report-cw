@@ -580,13 +580,13 @@ function formatTime(date) {
 }
 
 // Función para verificar si una fecha es válida y pertenece a días laborables
-function isWeekday(date) {
+function isWeekendday(date) {
   const day = date.getDay();
   return day === 6 || day === 0; // Sabado = 6, Domingo = 0
 }
 
 // Función para obtener el nombre del día de la semana (solo sábado y domingo)
-function getDayName(date) {
+function getDayNameWeekend(date) {
   const dayNames = ["DOMINGO", "SÁBADO"];
   const dayIndex = date.getDay(); // Obtiene el índice del día directamente
   if (dayIndex === 6) return `${dayNames[1]} ${String(date.getDate()).padStart(2, '0')}`; // Sábado
@@ -635,7 +635,7 @@ app.post('/upload_weekend', upload.single('file'), async (req, res) => {
     // Filtrar registros solo de lunes a viernes y con fechas válidas
     const filteredRecords = records.filter(record => {
       const entryTime = new Date(record.Tiempo);
-      return isWeekday(entryTime) && !isNaN(entryTime);
+      return isWeekendday(entryTime) && !isNaN(entryTime);
     });
 
     // Extraer fechas únicas y ordenarlas
@@ -647,7 +647,7 @@ app.post('/upload_weekend', upload.single('file'), async (req, res) => {
     // Convertir fechas únicas a formato legible
     const daysOfWeek = uniqueDates.map(dateStr => {
       const date = new Date(dateStr);
-      return getDayName(date);
+      return getDayNameWeekend(date);
     }).filter(Boolean); // Filtrar valores nulos o inválidos
 
     const workbook = new ExcelJS.Workbook();
