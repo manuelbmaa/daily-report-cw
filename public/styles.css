@@ -44,23 +44,12 @@ button:hover {
   color: green;
 }
 
-.card {
-  border: none;
-  border-radius: 15px;
+.card{
+  border-radius: 0px;
+  border-color: transparent !important;
 }
-
 .card-body {
   padding: 2rem;
-}
-
-.form-control {
-  border: 1px solid #ced4da;
-  border-radius: 10px;
-}
-
-.form-control:focus {
-  border-color: #313945;
-  box-shadow: 0 0 5px rgba(49, 57, 69, 0.5);
 }
 
 .btn {
@@ -82,14 +71,21 @@ button:hover {
   transition: box-shadow 0.3s ease;
 }
 
-
 .section-title {
   color: #313945;
   font-weight: bold;
 }
 
-.shadow-sm {
-  box-shadow: 10px 1rem .25rem rgba(0, 0, 0, .075) !important;
+main{
+  box-shadow: 15px 1rem .14rem rgba(0, 0, 0, .075) !important;
+  border: 1.2px solid #ced4da;
+  border-radius: 11px;
+  background-color: white;
+  padding: 2.5rem;
+}
+
+.nav-tabs{
+  border-bottom: none !important;
 }
 
 /* Estilo para las tabs */
@@ -97,19 +93,38 @@ button:hover {
   background-color: #313945;
   color: white;
   border: none;
-  border-radius: 0;
+  margin-left: 2px;
+  border-radius: 5px;
 }
 
 /* Cambio de estilo al pasar el mouse */
 .nav-tabs .nav-link:hover {
   background-color: white;
   color: black;
+  transition: box-shadow 0.3s ease;
 }
 
 /* Pestaña activa */
 .nav-tabs .nav-link.active {
-  background-color: white;
-  color: black;
+  background-color: #14161a;
+  color: white;
+}
+
+/* Menu Nav Tabs*/
+@media (max-width: 768px) {
+  .nav-tabs {
+    display: none; /* Oculta las pestañas en pantallas pequeñas */
+  }
+
+  #tabSelector {
+    display: block; /* Muestra el selector en pantallas pequeñas */
+  }
+}
+
+@media (min-width: 769px) {
+  #tabSelector {
+    display: none; /* Oculta el selector en pantallas grandes */
+  }
 }
 
 footer {

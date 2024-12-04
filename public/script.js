@@ -1,3 +1,15 @@
+// Lógica de Nav Tabs
+document.getElementById('tabSelector').addEventListener('change', function () {
+    const selectedTab = this.value;
+    const tabs = document.querySelectorAll('.nav-tabs .nav-link');
+  
+    tabs.forEach(tab => {
+      if (tab.getAttribute('data-bs-target').includes(selectedTab)) {
+        tab.click(); // Activa la pestaña correspondiente
+      }
+    });
+  });
+
 // Manejo del formulario para el Reporte del Dia
 document.getElementById("uploadForm").addEventListener("submit", async (event) => {
     event.preventDefault();
