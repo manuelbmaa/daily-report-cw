@@ -92,7 +92,7 @@ main{
 .nav-tabs .nav-link {
   background-color: #313945;
   color: white;
-  border: none;
+  border: 1px solid transparent;
   margin-left: 2px;
   border-radius: 5px;
 }
@@ -101,6 +101,9 @@ main{
 .nav-tabs .nav-link:hover {
   background-color: white;
   color: black;
+  border-color: #313945;
+  transform: scale(1.01);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transition: box-shadow 0.3s ease;
 }
 
