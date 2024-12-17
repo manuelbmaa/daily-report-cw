@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Importa los arreglos desde el users_mega.js
-const { CW_USERS, INJUVE_USERS, MOTORISTAS_USERS, ADDN_USERS, IT_PROYECTOS_USERS, INVEST_USERS } = require('./users_mega');
+const { CW_USERS, INJUVE_USERS, MOTORISTAS_USERS, ADDN_USERS, IT_PROYECTOS_USERS, INVEST_USERS, NAME_MAPPING } = require('./users_mega');
 
 const app = express();
 const upload = multer({ dest: 'uploads/' });
@@ -101,26 +101,30 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     });
 
     let rowIndex = 2;
-    CW_USERS.forEach(name => {
-      const times = userEntries[name];
-      if (times && times.length > 0) {
-        times.sort((a, b) => a - b);
-        const firstEntry = times[0];
-        const lastEntry = times[times.length - 1];
+    // Configurar la celda para el nombre del usuario
+  CW_USERS.forEach(name => {
+  const times = userEntries[name];
+  if (times && times.length > 0) {
+    times.sort((a, b) => a - b);
+    const firstEntry = times[0];
+    const lastEntry = times[times.length - 1];
 
-        const firstEntryTime = formatTime(firstEntry);
-        const lastEntryTime = formatTime(lastEntry);
-        const hoursReported = calculateHoursDifference(firstEntry, lastEntry);
+    const firstEntryTime = formatTime(firstEntry);
+    const lastEntryTime = formatTime(lastEntry);
+    const hoursReported = calculateHoursDifference(firstEntry, lastEntry);
 
-      // Escribir en las celdas en el orden de CW_USERS
-      worksheet.mergeCells(`A${rowIndex}:A${rowIndex + 2}`);
-      const nameCell = worksheet.getCell(`A${rowIndex}`);
-      nameCell.value = name;
-      nameCell.alignment = { vertical: 'middle', horizontal: 'center' };
-      nameCell.font = { name: 'Calibri Light', size: 9, bold: true };
+    // Sustituir el nombre por el preferido si existe en NAME_MAPPING
+    const displayName = NAME_MAPPING[name] || name;
 
-      for (let i = 0; i < 3; i++) {
-        worksheet.getCell(`A${rowIndex + i}`).border = {
+    // Escribir en las celdas en el orden de CW_USERS
+    worksheet.mergeCells(`A${rowIndex}:A${rowIndex + 2}`);
+    const nameCell = worksheet.getCell(`A${rowIndex}`);
+    nameCell.value = displayName; // Escribe el nombre preferido
+    nameCell.alignment = { vertical: 'middle', horizontal: 'center' };
+    nameCell.font = { name: 'Calibri Light', size: 9, bold: true };
+
+    for (let i = 0; i < 3; i++) {
+      worksheet.getCell(`A${rowIndex + i}`).border = {
         top: { style: 'thin' },
         left: { style: 'thin' },
         bottom: { style: 'thin' },
@@ -263,18 +267,19 @@ app.post('/upload_morning', upload.single('file'), async (req, res) => {
 
     let rowIndex = 2;
     CW_USERS.forEach(name => {
+      const displayName = NAME_MAPPING[name] || name; // Usa el nombre mapeado si existe, o el original
       const nameCell = worksheet.getCell(`A${rowIndex}`);
       const reportCell = worksheet.getCell(`B${rowIndex}`);
       const timeCell = worksheet.getCell(`C${rowIndex}`);
 
       // Configurar el estilo de la celda del nombre
-      nameCell.value = name;
+      nameCell.value = displayName; // Escribe el nombre mapeado
       nameCell.font = { name: 'Calibri Light', size: 9, bold: true };
-      
+
       // Configurar el estilo de la celda "Primer Marcaje"
       reportCell.value = "Primer Marcaje";
       reportCell.font = { name: 'Calibri Light', size: 9 }; // Sin negrita
-      
+
       // Configurar el estilo de la celda de tiempo
       timeCell.value = formatTimeMorning(userEntries[name]);
       timeCell.font = { name: 'Calibri Light', size: 9 }; // Sin negrita
@@ -482,10 +487,11 @@ app.post('/upload_weekly', upload.single('file'), async (req, res) => {
       // Rellenar datos en la hoja
       let rowIndex = 2;
       users.forEach(user => {
+        const displayName = NAME_MAPPING[user] || user; // Usa el nombre mapeado si existe, o el original
         const entries = userEntries[user];
         worksheet.mergeCells(`A${rowIndex}:A${rowIndex + 2}`);
         const nameCell = worksheet.getCell(`A${rowIndex}`);
-        nameCell.value = user;
+        nameCell.value = displayName; // Escribe el nombre mapeado
         nameCell.alignment = centeredAlignment;
         nameCell.font = { ...generalFontStyle, bold: true };
         nameCell.border = borderStyle;
@@ -499,13 +505,98 @@ app.post('/upload_weekly', upload.single('file'), async (req, res) => {
             : "00:00:00";
 
           // Rellenar celdas con los datos
+          // Configurar la celda "Primer Marcaje"
           worksheet.getCell(`B${rowIndex}`).value = "Primer Marcaje";
+          const firstMarkCell = worksheet.getCell(`B${rowIndex}`);
+          firstMarkCell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'FFFFFF' }, // Fondo azul oscuro
+          };
+          firstMarkCell.font = {
+              color: { argb: '000000' }, // Letra blanca
+              name: 'Calibri Light',
+              size: 9,
+          };
+          firstMarkCell.alignment = {
+              vertical: 'middle',
+              horizontal: 'left',
+          };
+          firstMarkCell.border = borderStyle; // Aplica bordes
+
+          // Configurar la celda que contiene el valor del Primer Marcaje
           worksheet.getCell(`${String.fromCharCode(67 + index)}${rowIndex}`).value = firstTime;
 
+          // Configurar la celda que contiene el valor del Primer Marcaje
+          const firstTimeCell = worksheet.getCell(`${String.fromCharCode(67 + index)}${rowIndex}`);
+          firstTimeCell.value = firstTime;
+          firstTimeCell.font = {
+              name: 'Calibri Light',
+              size: 9,
+          };
+          firstTimeCell.alignment = {
+              vertical: 'middle',
+              horizontal: 'center',
+          };
+          firstTimeCell.border = borderStyle;
+
+          // Configurar la celda "Último Marcaje"
           worksheet.getCell(`B${rowIndex + 1}`).value = "Último Marcaje";
+          const lastMarkCell = worksheet.getCell(`B${rowIndex + 1}`);
+          lastMarkCell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'FFFFFF' }, // Fondo azul oscuro
+          };
+          lastMarkCell.font = {
+              color: { argb: '000000' }, // Letra blanca
+              name: 'Calibri Light',
+              size: 9,
+          };
+          lastMarkCell.alignment = {
+              vertical: 'middle',
+              horizontal: 'left',
+          };
+          lastMarkCell.border = borderStyle; // Aplica bordes
+
+          // Configurar la celda que contiene el valor del Último Marcaje
           worksheet.getCell(`${String.fromCharCode(67 + index)}${rowIndex + 1}`).value = lastTime;
 
+          // Configurar la celda que contiene el valor del Último Marcaje
+          const lastTimeCell = worksheet.getCell(`${String.fromCharCode(67 + index)}${rowIndex + 1}`);
+          lastTimeCell.value = lastTime;
+          lastTimeCell.font = {
+              name: 'Calibri Light',
+              size: 9,
+          };
+          lastTimeCell.alignment = {
+              vertical: 'middle',
+              horizontal: 'center', // Centrado
+          };
+          lastTimeCell.border = borderStyle;
+
+          // Configurar la celda "Horas Reportadas"
           worksheet.getCell(`B${rowIndex + 2}`).value = "Horas Reportadas";
+          const reportCell = worksheet.getCell(`B${rowIndex + 2}`);
+          reportCell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: '002060' }, // Fondo azul oscuro
+          };
+          reportCell.font = {
+              color: { argb: 'FFFFFF' }, // Letra blanca
+              name: 'Calibri Light',
+              size: 9,
+              bold: true,
+          };
+          reportCell.alignment = {
+              vertical: 'middle',
+              horizontal: 'left',
+          };
+          reportCell.border = borderStyle; // Aplicar bordes
+
+
+          // Configurar la celda que contiene las horas reportadas
           const hoursCell = worksheet.getCell(`${String.fromCharCode(67 + index)}${rowIndex + 2}`);
           hoursCell.value = hoursReported;
 
@@ -515,6 +606,15 @@ app.post('/upload_weekly', upload.single('file'), async (req, res) => {
               type: 'pattern',
               pattern: 'solid',
               fgColor: { argb: '8ED973' },
+            };
+            hoursCell.font = {
+              color: { argb: '000000' }, // Letra blanca
+              name: 'Calibri Light',
+              size: 9,
+            };
+            hoursCell.alignment = {
+                vertical: 'middle',
+                horizontal: 'center',
             };
             hoursCell.font = { ...generalFontStyle, bold: true };
           }
@@ -611,7 +711,7 @@ function applyBordersToRow(row) {
   });
 }
 
-// Endpoint para procesar y generar el reporte semanal
+// Endpoint para procesar y generar el reporte del fin de semana
 app.post('/upload_weekend', upload.single('file'), async (req, res) => {
   try {
     const filePath = req.file.path;
@@ -698,10 +798,11 @@ app.post('/upload_weekend', upload.single('file'), async (req, res) => {
       // Rellenar datos en la hoja
       let rowIndex = 2;
       users.forEach(user => {
+        const displayName = NAME_MAPPING[user] || user; // Usa el nombre mapeado si existe, o el original
         const entries = userEntries[user];
         worksheet.mergeCells(`A${rowIndex}:A${rowIndex + 2}`);
         const nameCell = worksheet.getCell(`A${rowIndex}`);
-        nameCell.value = user;
+        nameCell.value = displayName; // Escribe el nombre mapeado
         nameCell.alignment = centeredAlignment;
         nameCell.font = { ...generalFontStyle, bold: true };
         nameCell.border = borderStyle;
@@ -763,8 +864,8 @@ app.post('/upload_weekend', upload.single('file'), async (req, res) => {
       fs.unlinkSync(filePathToSave);
     });
   } catch (error) {
-    console.error("Error procesando el reporte semanal:", error);
-    res.status(500).send("Error procesando el reporte semanal");
+    console.error("Error procesando el reporte de fin de semana:", error);
+    res.status(500).send("Error procesando el reporte de fin de semana");
   }
 });
 
