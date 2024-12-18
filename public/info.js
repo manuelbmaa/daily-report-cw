@@ -1,7 +1,7 @@
 // Credenciales predefinidas
 const CREDENTIALS = {
     username: "admin",
-    password: "1234", // Contraseña
+    password: "M3g4c3ntr0.$", // Contraseña
 };
 
 // Crear una función para generar un hash simple (usamos btoa para codificar en base64)

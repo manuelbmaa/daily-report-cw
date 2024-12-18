@@ -10,6 +10,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
   <link rel="icon" href="ico.png" type="image/png" sizes="32x32">
   <script src="loggedin.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <!-- CSS -->
   <link rel="stylesheet" href="styles.css" type="text/css">
 </head>
@@ -26,12 +27,35 @@
     </div>
   </nav>
   <script>
-    // Manejar el cierre de sesión
+    // Manejar el cierre de sesión con SweetAlert2
     document.getElementById("logoutButton").addEventListener("click", function () {
-      localStorage.removeItem("loggedIn");
-      window.location.href = "login.html";
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Vas a cerrar sesión. Esta acción no se puede deshacer.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, cerrar sesión',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Acción de cierre de sesión
+          localStorage.removeItem("loggedIn");
+          Swal.fire({
+            title: '¡Sesión cerrada!',
+            text: 'Has cerrado sesión exitosamente.',
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false
+          }).then(() => {
+            // Redirigir al usuario después de cerrar sesión
+            window.location.href = "login.html";
+          });
+        }
+      });
     });
-  </script>
+  </script>  
 
   <!-- Main Content -->
   <main class="container my-5">
@@ -150,7 +174,7 @@
   <footer class="text-center py-4">
     <div class="container">
       <hr class="mb-4" style="border-top: 1px solid #ffffff;">
-      <p class="mb-2">© 2024 Generador de Reportes</p>
+      <p class="mb-2">© 2024 Generador de Reportes V1.0</p>
       <p>Creado por
         <a href="https://www.linkedin.com/in/renealexanderhernandez/" target="_blank"><b>René Hernández</b></a> &
         <a href="https://www.linkedin.com/in/manuel-marc%C3%ADa-264024219/" target="_blank"><b>Manuel Bolaños</b></a>
