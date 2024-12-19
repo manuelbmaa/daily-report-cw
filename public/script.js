@@ -12,16 +12,22 @@ document.getElementById('tabSelector').addEventListener('change', function () {
 
 // Manejo del formulario para el Reporte del Dia
 document.getElementById("uploadForm").addEventListener("submit", async (event) => {
-    event.preventDefault();
+    event.preventDefault();  // Evita que el formulario se envíe de manera convencional.
 
+    // Captura el valor del grupo de usuarios seleccionado
+    const userGroup = document.getElementById("groupSelectorMorning").value;
+    
+    // Crea un nuevo FormData con el archivo y el campo userGroup
     const formData = new FormData();
     const fileInput = document.getElementById("fileInput");
-    formData.append("file", fileInput.files[0]);
-      
+    formData.append("file", fileInput.files[0]);  // Agrega el archivo al FormData
+    formData.append("userGroup", userGroup);  // Agrega el grupo de usuarios seleccionado
+
     try {
+        // Envía los datos al servidor usando fetch
         const response = await fetch("/upload", {
             method: "POST",
-            body: formData,
+            body: formData,  // Envío el FormData con archivo y userGroup
         });
 
         if (response.ok) {
@@ -37,9 +43,9 @@ document.getElementById("uploadForm").addEventListener("submit", async (event) =
             const downloadUrl = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = downloadUrl;
-            a.download = fileName; // Usa el nombre de archivo obtenido dinámicamente
+            a.download = fileName;  // Usa el nombre de archivo obtenido dinámicamente
             document.body.appendChild(a);
-            a.click();
+            a.click();  // Inicia la descarga
             a.remove();
         } else {
             document.getElementById("message").textContent = "Error al procesar el archivo.";

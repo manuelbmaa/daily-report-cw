@@ -44,6 +44,33 @@ function formatTime(date) {
 app.post('/upload', upload.single('file'), async (req, res) => {
   try {
     const filePath = req.file.path;
+    const { userGroup } = req.body;  // Ahora debes recibir correctamente el grupo
+    
+    // Mapeo de grupos a nombres de hojas y archivos
+    const groupNames = {
+      CW_USERS: "Marcaje del Día CW",
+      INJUVE_USERS: "Marcaje del Día INJUVE",
+      MOTORISTAS_USERS: "Marcaje del Día MOTORISTAS",
+      ADDN_USERS: "Marcaje del Día ADDN",
+      IT_PROYECTOS_USERS: "Marcaje del Día IT PROYECTOS",
+      INVEST_USERS: "Marcaje del Día INVEST"
+    };
+
+    // Validación del grupo de usuarios
+    const validGroups = {
+      CW_USERS,
+      INJUVE_USERS,
+      MOTORISTAS_USERS,
+      ADDN_USERS,
+      IT_PROYECTOS_USERS,
+      INVEST_USERS
+    };
+
+    const selectedUsers = validGroups[userGroup]; // Obtiene la lista de usuarios correcta
+    if (!selectedUsers) {
+      throw new Error(`Grupo de usuarios no válido: ${userGroup}`);
+    }
+    
     let fileContent = fs.readFileSync(filePath, 'utf-8');
 
     const lines = fileContent.split('\n');
@@ -61,7 +88,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     const userEntries = {};
     records.forEach(record => {
       const fullName = `${record.Nombre} ${record.Apellido}`;
-      if (CW_USERS.includes(fullName)) {
+      if (selectedUsers.includes(fullName)) {
         if (!userEntries[fullName]) {
           userEntries[fullName] = [];
         }
@@ -73,7 +100,9 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     });
 
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Report");
+    // Usa el nombre del grupo para asignar el nombre de la hoja
+    const sheetName = groupNames[userGroup] || "Report"; 
+    const worksheet = workbook.addWorksheet(sheetName);
 
     const firstDate = new Date(records[0].Tiempo); // Obtén la fecha del primer registro
     const dayName = getDayName(firstDate);
@@ -102,87 +131,87 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 
     let rowIndex = 2;
     // Configurar la celda para el nombre del usuario
-  CW_USERS.forEach(name => {
-  const times = userEntries[name];
-  if (times && times.length > 0) {
-    times.sort((a, b) => a - b);
-    const firstEntry = times[0];
-    const lastEntry = times[times.length - 1];
+    selectedUsers.forEach(name => {
+      const times = userEntries[name];
+      if (times && times.length > 0) {
+        times.sort((a, b) => a - b);
+        const firstEntry = times[0];
+        const lastEntry = times[times.length - 1];
 
-    const firstEntryTime = formatTime(firstEntry);
-    const lastEntryTime = formatTime(lastEntry);
-    const hoursReported = calculateHoursDifference(firstEntry, lastEntry);
+        const firstEntryTime = formatTime(firstEntry);
+        const lastEntryTime = formatTime(lastEntry);
+        const hoursReported = calculateHoursDifference(firstEntry, lastEntry);
 
-    // Sustituir el nombre por el preferido si existe en NAME_MAPPING
-    const displayName = NAME_MAPPING[name] || name;
+        // Sustituir el nombre por el preferido si existe en NAME_MAPPING
+        const displayName = NAME_MAPPING[name] || name;
 
-    // Escribir en las celdas en el orden de CW_USERS
-    worksheet.mergeCells(`A${rowIndex}:A${rowIndex + 2}`);
-    const nameCell = worksheet.getCell(`A${rowIndex}`);
-    nameCell.value = displayName; // Escribe el nombre preferido
-    nameCell.alignment = { vertical: 'middle', horizontal: 'center' };
-    nameCell.font = { name: 'Calibri Light', size: 9, bold: true };
+        // Escribir en las celdas en el orden de CW_USERS
+        worksheet.mergeCells(`A${rowIndex}:A${rowIndex + 2}`);
+        const nameCell = worksheet.getCell(`A${rowIndex}`);
+        nameCell.value = displayName; // Escribe el nombre preferido
+        nameCell.alignment = { vertical: 'middle', horizontal: 'center' };
+        nameCell.font = { name: 'Calibri Light', size: 9, bold: true };
 
-    for (let i = 0; i < 3; i++) {
-      worksheet.getCell(`A${rowIndex + i}`).border = {
-        top: { style: 'thin' },
-        left: { style: 'thin' },
-        bottom: { style: 'thin' },
-        right: { style: 'thin' },
-      };
-      worksheet.getCell(`B${rowIndex + i}`).font = { name: 'Calibri Light', size: 9 };
-      worksheet.getCell(`B${rowIndex + i}`).border = {
-        top: { style: 'thin' },
-        left: { style: 'thin' },
-        bottom: { style: 'thin' },
-        right: { style: 'thin' },
-      };
-      worksheet.getCell(`C${rowIndex + i}`).font = { name: 'Calibri Light', size: 9 };
-      worksheet.getCell(`C${rowIndex + i}`).border = {
-        top: { style: 'thin' },
-        left: { style: 'thin' },
-        bottom: { style: 'thin' },
-        right: { style: 'thin' },
-      };
-      worksheet.getCell(`C${rowIndex + i}`).alignment = {
-        vertical: 'middle',
-        horizontal: 'center'
-      };
-    }
+        for (let i = 0; i < 3; i++) {
+          worksheet.getCell(`A${rowIndex + i}`).border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' },
+          };
+          worksheet.getCell(`B${rowIndex + i}`).font = { name: 'Calibri Light', size: 9 };
+          worksheet.getCell(`B${rowIndex + i}`).border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' },
+          };
+          worksheet.getCell(`C${rowIndex + i}`).font = { name: 'Calibri Light', size: 9 };
+          worksheet.getCell(`C${rowIndex + i}`).border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' },
+          };
+          worksheet.getCell(`C${rowIndex + i}`).alignment = {
+            vertical: 'middle',
+            horizontal: 'center'
+          };
+        }
 
-    worksheet.getCell(`B${rowIndex}`).value = "Primer Marcaje";
-    worksheet.getCell(`C${rowIndex}`).value = firstEntryTime;
+        worksheet.getCell(`B${rowIndex}`).value = "Primer Marcaje";
+        worksheet.getCell(`C${rowIndex}`).value = firstEntryTime;
 
-    worksheet.getCell(`B${rowIndex + 1}`).value = "Último Marcaje";
-    worksheet.getCell(`C${rowIndex + 1}`).value = lastEntryTime;
+        worksheet.getCell(`B${rowIndex + 1}`).value = "Último Marcaje";
+        worksheet.getCell(`C${rowIndex + 1}`).value = lastEntryTime;
 
-    worksheet.getCell(`B${rowIndex + 2}`).value = "Horas Reportadas";
-    worksheet.getCell(`B${rowIndex + 2}`).fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: '002060' },
-    };
-    worksheet.getCell(`B${rowIndex + 2}`).font = { name: 'Calibri Light', size: 9, color: { argb: 'FFFFFF' }, bold: true };
-    worksheet.getCell(`B${rowIndex + 2}`).alignment = { vertical: 'middle' };
+        worksheet.getCell(`B${rowIndex + 2}`).value = "Horas Reportadas";
+        worksheet.getCell(`B${rowIndex + 2}`).fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: '002060' },
+        };
+        worksheet.getCell(`B${rowIndex + 2}`).font = { name: 'Calibri Light', size: 9, color: { argb: 'FFFFFF' }, bold: true };
+        worksheet.getCell(`B${rowIndex + 2}`).alignment = { vertical: 'middle' };
 
-    worksheet.getCell(`C${rowIndex + 2}`).value = hoursReported;
-    worksheet.getCell(`C${rowIndex + 2}`).fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: '8ED973' }
-    };
-    worksheet.getCell(`C${rowIndex + 2}`).alignment = { vertical: 'middle', horizontal: 'center' };
-    worksheet.getCell(`C${rowIndex + 2}`).font = { name: 'Calibri Light', size: 9, bold: true };
-    
-    rowIndex += 3;
-  }
-});
+        worksheet.getCell(`C${rowIndex + 2}`).value = hoursReported;
+        worksheet.getCell(`C${rowIndex + 2}`).fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: '8ED973' }
+        };
+        worksheet.getCell(`C${rowIndex + 2}`).alignment = { vertical: 'middle', horizontal: 'center' };
+        worksheet.getCell(`C${rowIndex + 2}`).font = { name: 'Calibri Light', size: 9, bold: true };
+        
+        rowIndex += 3;
+      }
+    });
 
     // Formatear la fecha del primer registro como "dd-MM-yyyy"
     const formattedDate = `${String(firstDate.getDate()).padStart(2, '0')}-${String(firstDate.getMonth() + 1).padStart(2, '0')}-${firstDate.getFullYear()}`;
 
     // Nombre del archivo con la fecha del primer registro
-    const fileName = `MARCAJE DEL DIA CW ${formattedDate}.xlsx`;
+    const fileName = `${groupNames[userGroup]} ${formattedDate}.xlsx`;
     const filePathToSave = path.join(__dirname, fileName);
     
     await workbook.xlsx.writeFile(filePathToSave);
