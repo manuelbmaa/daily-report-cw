@@ -15,7 +15,7 @@ document.getElementById("uploadForm").addEventListener("submit", async (event) =
     event.preventDefault();  // Evita que el formulario se envíe de manera convencional.
 
     // Captura el valor del grupo de usuarios seleccionado
-    const userGroup = document.getElementById("groupSelectorMorning").value;
+    const userGroup = document.getElementById("groupSelector").value;
     
     // Crea un nuevo FormData con el archivo y el campo userGroup
     const formData = new FormData();
