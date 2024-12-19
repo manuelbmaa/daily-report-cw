@@ -97,6 +97,15 @@
                   <div class="card-body">
                     <h1 class="h4 section-title mb-4">Reporte de la Mañana</h1>
                     <form id="morningForm" enctype="multipart/form-data">
+                      <label for="groupSelectorMorning" class="form-label">Seleccionar Grupo de Usuarios</label>
+                        <select name="userGroup" id="groupSelectorMorning" class="form-select mb-3" required>
+                          <option value="CW_USERS">CW</option>
+                          <option value="INJUVE_USERS">INJUVE</option>
+                          <option value="MOTORISTAS_USERS">Motoristas</option>
+                          <option value="ADDN_USERS">ADDN</option>
+                          <option value="IT_PROYECTOS_USERS">IT Proyectos</option>
+                          <option value="INVEST_USERS">Invest</option>
+                        </select>
                     <label for="morningFileInput" class="form-label">Seleccionar archivo</label>
                     <input type="file" name="file" id="morningFileInput" class="form-control mb-3" accept=".csv" required>
                     <button type="submit" class="btn btn-lg w-100 text-white" style="background-color: #313945;">
@@ -116,8 +125,8 @@
                     <div class="card-body">
                       <h1 class="h4 section-title mb-4">Reporte Diario</h1>
                       <form id="uploadForm" enctype="multipart/form-data">
-                        <label for="groupSelectorMorning" class="form-label">Seleccionar Grupo de Usuarios</label>
-                        <select name="userGroup" id="groupSelectorMorning" class="form-select mb-3" required>
+                        <label for="groupSelector" class="form-label">Seleccionar Grupo de Usuarios</label>
+                        <select name="userGroup" id="groupSelector" class="form-select mb-3" required>
                           <option value="CW_USERS">CW</option>
                           <option value="INJUVE_USERS">INJUVE</option>
                           <option value="MOTORISTAS_USERS">Motoristas</option>

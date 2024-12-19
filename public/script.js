@@ -60,9 +60,13 @@ document.getElementById("uploadForm").addEventListener("submit", async (event) =
 document.getElementById("morningForm").addEventListener("submit", async (event) => {
     event.preventDefault();
 
+     // Captura el valor del grupo de usuarios seleccionado
+     const userGroup = document.getElementById("groupSelectorMorning").value;
+
     const formData = new FormData();
     const fileInput = document.getElementById("morningFileInput");
     formData.append("file", fileInput.files[0]);
+    formData.append("userGroup", userGroup);  // Agrega el grupo de usuarios seleccionado
 
     try {
         const response = await fetch("/upload_morning", {

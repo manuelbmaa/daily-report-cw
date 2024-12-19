@@ -48,12 +48,12 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     
     // Mapeo de grupos a nombres de hojas y archivos
     const groupNames = {
-      CW_USERS: "Marcaje del Día CW",
-      INJUVE_USERS: "Marcaje del Día INJUVE",
-      MOTORISTAS_USERS: "Marcaje del Día MOTORISTAS",
-      ADDN_USERS: "Marcaje del Día ADDN",
-      IT_PROYECTOS_USERS: "Marcaje del Día IT PROYECTOS",
-      INVEST_USERS: "Marcaje del Día INVEST"
+      CW_USERS: "MARCAJE DEL DIA CW",
+      INJUVE_USERS: "MARCAJE DEL DIA INJUVE",
+      MOTORISTAS_USERS: "MARCAJE DEL DIA MOTORISTAS",
+      ADDN_USERS: "MARCAJE DEL DIA ADDN",
+      IT_PROYECTOS_USERS: "MARCAJE DEL DIA IT PROYECTOS",
+      INVEST_USERS: "MARCAJE DEL DIA INVEST"
     };
 
     // Validación del grupo de usuarios
@@ -241,6 +241,33 @@ function formatTimeMorning(date) {
 app.post('/upload_morning', upload.single('file'), async (req, res) => {
   try {
     const filePath = req.file.path;
+    const { userGroup } = req.body;
+
+    // Mapeo de grupos a nombres de hojas y archivos
+    const groupNames = {
+      CW_USERS: "REPORTE DE LA MAÑANA CW",
+      INJUVE_USERS: "REPORTE DE LA MAÑANA INJUVE",
+      MOTORISTAS_USERS: "REPORTE DE LA MAÑANA MOTORISTAS",
+      ADDN_USERS: "REPORTE DE LA MAÑANA ADDN",
+      IT_PROYECTOS_USERS: "REPORTE DE LA MAÑANA IT PROYECTOS",
+      INVEST_USERS: "REPORTE DE LA MAÑANA INVEST"
+    };
+
+    // Validación del grupo de usuarios
+    const validGroups = {
+      CW_USERS,
+      INJUVE_USERS,
+      MOTORISTAS_USERS,
+      ADDN_USERS,
+      IT_PROYECTOS_USERS,
+      INVEST_USERS
+    };
+
+    const selectedUsers = validGroups[userGroup]; // Obtiene la lista de usuarios correcta
+    if (!selectedUsers) {
+      throw new Error(`Grupo de usuarios no válido: ${userGroup}`);
+    }
+
     let fileContent = fs.readFileSync(filePath, 'utf-8');
 
     // Filtrar líneas innecesarias
@@ -258,13 +285,13 @@ app.post('/upload_morning', upload.single('file'), async (req, res) => {
     });
 
     const userEntries = {};
-    CW_USERS.forEach(name => {
+    selectedUsers.forEach(name => {
       userEntries[name] = null; // Inicializa con null para cada usuario
     });
 
     records.forEach(record => {
       const fullName = `${record.Nombre} ${record.Apellido}`;
-      if (CW_USERS.includes(fullName)) {
+      if (selectedUsers.includes(fullName)) {
         const entryTime = new Date(record.Tiempo);
         if (!isNaN(entryTime) && (!userEntries[fullName] || entryTime < userEntries[fullName])) {
           userEntries[fullName] = entryTime; // Guarda el primer marcaje más temprano
@@ -273,9 +300,11 @@ app.post('/upload_morning', upload.single('file'), async (req, res) => {
     });
 
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Morning Report");
+    // Usa el nombre del grupo para asignar el nombre de la hoja
+    const sheetName = groupNames[userGroup] || "Report"; 
+    const worksheet = workbook.addWorksheet(sheetName);
 
-    const firstDate = new Date(records[0].Tiempo);
+    const firstDate = new Date(records[0].Tiempo); // Obtén la fecha del primer registro
     const dayName = getDayName(firstDate);
 
     worksheet.columns = [
@@ -295,7 +324,7 @@ app.post('/upload_morning', upload.single('file'), async (req, res) => {
     });
 
     let rowIndex = 2;
-    CW_USERS.forEach(name => {
+    selectedUsers.forEach(name => {
       const displayName = NAME_MAPPING[name] || name; // Usa el nombre mapeado si existe, o el original
       const nameCell = worksheet.getCell(`A${rowIndex}`);
       const reportCell = worksheet.getCell(`B${rowIndex}`);
@@ -325,7 +354,7 @@ app.post('/upload_morning', upload.single('file'), async (req, res) => {
     });
 
     const formattedDate = `${String(firstDate.getDate()).padStart(2, '0')}-${String(firstDate.getMonth() + 1).padStart(2, '0')}-${firstDate.getFullYear()}`;
-    const fileName = `REPORTE DE LA MAÑANA CW ${formattedDate}.xlsx`;
+    const fileName = `${groupNames[userGroup]} ${formattedDate}.xlsx`;
     const filePathToSave = path.join(__dirname, fileName);
 
     await workbook.xlsx.writeFile(filePathToSave);
